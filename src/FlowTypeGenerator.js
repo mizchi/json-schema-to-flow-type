@@ -31,14 +31,13 @@ const processObjectSchema = (flowSchema: FlowSchema, processor: SchemaProcessor)
         processor(fieldFlowSchema),
       );
 
-      if (_.includes(flowSchema.$required, field)) {
+      if (flowSchema.$required instanceof Array && _.includes(flowSchema.$required, field)) {
         return ast;
       }
 
       return optional(ast);
     },
   );
-
   return t.objectTypeAnnotation(
     properties,
     flowSchema.$union ? [
@@ -53,7 +52,11 @@ const processObjectSchema = (flowSchema: FlowSchema, processor: SchemaProcessor)
 
 export const toFlowType = (flowSchema: FlowSchema): Object => {
   if (flowSchema.$flowRef) {
-    return t.identifier(upperCamelCase(flowSchema.$flowRef));
+    const isRequiredTrue = typeof flowSchema.required === 'boolean' && flowSchema.required;
+    return isRequiredTrue
+      ? t.identifier(upperCamelCase(flowSchema.$flowRef))
+      : optional(t.identifier(upperCamelCase(flowSchema.$flowRef)))
+      ;
   }
 
   if (flowSchema.$enum) {

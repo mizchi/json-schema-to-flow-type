@@ -120,6 +120,32 @@ test('should convert Object', (t) => {
   );
 });
 
+test('should convert Object by v3 required', (t) => {
+  t.deepEqual(
+    convertSchema({
+      type: 'object',
+      properties: {
+        string: {
+          type: 'string',
+          required: true,
+        },
+        number: {
+          type: 'number',
+        },
+      },
+    }),
+    flow('Object')
+      .props({
+        string: flow('string'),
+        number: flow('number'),
+      },
+      [
+        // 'string',
+      ],
+    ),
+  );
+});
+
 test('should convert Object with additionalProps', (t) => {
   t.deepEqual(
     convertSchema({

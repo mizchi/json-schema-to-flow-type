@@ -32,7 +32,8 @@ export class FlowSchema {
   $id: string;
   $flowType: FlowType;
   $flowRef: ?string;
-  $required: ?Array<string>;
+  // $required: ?Array<string>;
+  $required: ?(Array<string> | boolean);
   $properties: ?{ [key: string]: FlowSchema };
   $enum: ?Array<any>;
   $union: ?Array<FlowSchema>;
@@ -167,8 +168,9 @@ export const convertSchema = (schema: Schema): FlowSchema => {
   }
 
   if (isObject(schema)) {
+    const required = (schema.required instanceof Array) ? schema.required : [];
     return f.flowType('Object')
-      .props(_.mapValues(schema.properties, convertSchema), schema.required)
+      .props(_.mapValues(schema.properties, convertSchema), required)
       .union([
         ...(_.map(schema.patternProperties, convertSchema)),
         (typeof schema.additionalProperties === 'object') ? convertSchema(schema.additionalProperties) : undefined,
